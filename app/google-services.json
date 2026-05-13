@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "491088403848",
+    "project_id": "kreedaankana-548da",
+    "storage_bucket": "kreedaankana-548da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:491088403848:android:0d08a32ab32a9f5b92ee3d",
+        "android_client_info": {
+          "package_name": "com.shreyas.kreedaankana"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "491088403848-tguhbn8qgjklr0hhes0orlaekdo971to.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.shreyas.kreedaankana",
+            "certificate_hash": "00c998f706b048357eafd941854e5de354229f29"
+          }
+        },
+        {
+          "client_id": "491088403848-398958tu997ien7a57kppt3kmgopti12.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNMkNPHJubkzccmrFzlTJPhtkms0WlKKA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "491088403848-398958tu997ien7a57kppt3kmgopti12.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
