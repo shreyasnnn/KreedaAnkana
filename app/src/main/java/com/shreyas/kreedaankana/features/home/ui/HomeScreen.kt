@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,6 +37,7 @@ fun HomeScreen(
     onNavigateToCreateTeam: () -> Unit,
     onNavigateToDiscoverTeams: () -> Unit,
     onNavigateToMyTeams: () -> Unit,
+    onNavigateToMyBookings: () -> Unit, // 🔹 NEW: Added My Bookings navigation callback
     challengeViewModel: ChallengeViewModel = viewModel(),
     notifViewModel: NotificationViewModel = viewModel(),
     bookingViewModel: BookingViewModel = viewModel(),
@@ -88,8 +90,8 @@ fun HomeScreen(
             item { NextBookingHero(nextBooking, onNavigateToBooking) }
 
             item {
-                Text("QUICK ACTIONS", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.Gray)
-                Spacer(modifier = Modifier.height(12.dp))
+                Text("QUICK ACTIONS", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.Gray, letterSpacing = 1.sp)
+                Spacer(modifier = Modifier.height(16.dp))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     ActionCard(Modifier.weight(1f), "My Teams", Icons.Default.Groups, Color(0xFF00E676), onNavigateToMyTeams)
@@ -108,13 +110,14 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                     ActionCard(Modifier.weight(1f), "View Scores", Icons.Default.BarChart, Color.White, onNavigateToScores)
-                    Spacer(Modifier.weight(1f))
+                    // 🔹 NEW: Replaced the Spacer with the My Bookings ActionCard
+                    ActionCard(Modifier.weight(1f), "My Bookings", Icons.Default.Bookmarks, Color.White, onNavigateToMyBookings)
                 }
             }
 
             item {
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Text("OPEN CHALLENGES", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.Gray)
+                    Text("OPEN CHALLENGES", fontSize = 12.sp, fontWeight = FontWeight.Black, color = Color.Gray, letterSpacing = 1.sp)
                     Text("See all →", color = Color(0xFF00C853), fontSize = 12.sp, modifier = Modifier.clickable { onNavigateToSchedule() })
                 }
             }
@@ -125,13 +128,16 @@ fun HomeScreen(
                 items(upcomingMatches.take(3)) { challenge ->
                     DashboardMatchCard(
                         title = "vs Any Team",
-                        subtitle = "${challenge.sportType} • ${challenge.location}",
+                        subtitle = "${challenge.sportType} • ${challenge.location.ifEmpty { "TBD" }}",
                         status = challenge.status.uppercase(),
                         color = if (challenge.status == "scheduled") Color(0xFF00C853) else Color(0xFFFFB300)
                     )
                     Spacer(Modifier.height(12.dp))
                 }
             }
+
+            // Extra padding at the bottom so cards aren't hidden behind the floating nav bar
+            item { Spacer(Modifier.height(80.dp)) }
         }
     }
 }
@@ -158,11 +164,74 @@ fun NextBookingHero(booking: Booking?, onBookNow: () -> Unit) {
 
 @Composable
 fun ActionCard(modifier: Modifier, title: String, icon: ImageVector, bg: Color, onClick: () -> Unit) {
-    Card(modifier = modifier.height(110.dp).clickable { onClick() }, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = bg), elevation = CardDefaults.cardElevation(2.dp)) {
-        Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
-            Icon(imageVector = icon, contentDescription = null, tint = if(bg == Color.White) Color(0xFF7E57C2) else Color.White, modifier = Modifier.size(28.dp))
-            Spacer(Modifier.height(10.dp))
-            Text(text = title, fontWeight = FontWeight.Bold, fontSize = 13.sp, color = if(bg == Color.White) Color.Black else Color.White)
+    // Determine colors based on whether this is a "Primary" card (Green background passed in) or Secondary (White)
+    val isPrimary = bg != Color.White
+    val containerColor = if (isPrimary) Color(0xFF004D40) else Color.White
+    val contentColor = if (isPrimary) Color.White else Color(0xFF004D40)
+    val iconBoxBg = if (isPrimary) Color(0xFF00E676) else Color(0xFFE8F5E9)
+    val iconTintColor = if (isPrimary) Color(0xFF004D40) else Color(0xFF2E7D32)
+
+    Card(
+        modifier = modifier
+            .height(130.dp) // Taller for a premium widget feel
+            .clickable { onClick() },
+        shape = RoundedCornerShape(20.dp), // Smoother, larger corners
+        colors = CardDefaults.cardColors(containerColor = containerColor),
+        elevation = CardDefaults.cardElevation(if (isPrimary) 6.dp else 2.dp)
+    ) {
+        Box(Modifier.fillMaxSize()) {
+            // Subtle Background Watermark Accent
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .offset(x = 24.dp, y = 24.dp)
+                    .size(80.dp)
+                    .background(
+                        if (isPrimary) Color.White.copy(alpha = 0.05f) else Color(0xFF00E676).copy(alpha = 0.05f),
+                        CircleShape
+                    )
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.SpaceBetween, // Spreads icon and text
+                horizontalAlignment = Alignment.Start // Left-aligns content
+            ) {
+                // Top Left: Icon in a soft box
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .background(iconBoxBg, RoundedCornerShape(14.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(imageVector = icon, contentDescription = null, tint = iconTintColor, modifier = Modifier.size(24.dp))
+                }
+
+                // Bottom: Title and subtle arrow
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = title,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = contentColor,
+                        modifier = Modifier.weight(1f),
+                        lineHeight = 18.sp
+                    )
+
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = "Go",
+                        tint = contentColor.copy(alpha = 0.3f), // Very subtle indicator
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
         }
     }
 }

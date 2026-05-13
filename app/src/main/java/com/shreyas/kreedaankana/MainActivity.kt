@@ -3,7 +3,13 @@ package com.shreyas.kreedaankana
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
@@ -15,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -64,37 +72,84 @@ class MainActivity : ComponentActivity() {
                     snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
                     bottomBar = {
                         if (showBottomBar) {
-                            NavigationBar(
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp).clip(RoundedCornerShape(32.dp)),
-                                containerColor = Color.White, tonalElevation = 10.dp
+                            val items = listOf(
+                                Triple("Home", "home", Icons.Default.Home),
+                                Triple("Grounds", "grounds", Icons.Default.Sports),
+                                Triple("Matches", "challenges", Icons.AutoMirrored.Filled.CompareArrows),
+                                Triple("Scores", "scoreWall", Icons.Default.BarChart),
+                                Triple("Profile", "userProfile", Icons.Default.Person)
+                            )
+
+                            // 🔹 PREMIUM CUSTOM FLOATING BOTTOM BAR
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(start = 16.dp, end = 16.dp, bottom = 24.dp) // Floats above the edge
                             ) {
-                                val items = listOf(
-                                    Triple("Home", "home", Icons.Default.Home),
-                                    Triple("Grounds", "grounds", Icons.Default.Sports),
-                                    Triple("Challenges", "challenges", Icons.AutoMirrored.Filled.CompareArrows),
-                                    Triple("Scores", "scoreWall", Icons.Default.BarChart),
-                                    Triple("Profile", "userProfile", Icons.Default.Person)
-                                )
-                                items.forEach { (label, route, icon) ->
-                                    val selected = currentDestination?.hierarchy?.any { it.route == route } == true
-                                    NavigationBarItem(
-                                        icon = { Icon(icon, contentDescription = label) },
-                                        label = { Text(label) },
-                                        selected = selected,
-                                        onClick = {
-                                            navController.navigate(route) {
-                                                popUpTo(navController.graph.startDestinationId) { saveState = true }
-                                                launchSingleTop = true
-                                                restoreState = true
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = CircleShape, // Perfect pill shape
+                                    color = Color.White,
+                                    shadowElevation = 12.dp // Deep, premium shadow
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .padding(horizontal = 8.dp, vertical = 8.dp)
+                                            .fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        items.forEach { (label, route, icon) ->
+                                            val isSelected = currentDestination?.hierarchy?.any { it.route == route } == true
+
+                                            // Smooth color transitions
+                                            val background by animateColorAsState(
+                                                targetValue = if (isSelected) Color(0xFFE8F5E9) else Color.Transparent,
+                                                label = "bg_color"
+                                            )
+                                            val contentColor by animateColorAsState(
+                                                targetValue = if (isSelected) Color(0xFF00C853) else Color.LightGray,
+                                                label = "content_color"
+                                            )
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .clip(CircleShape)
+                                                    .background(background)
+                                                    .clickable(
+                                                        interactionSource = remember { MutableInteractionSource() },
+                                                        indication = null // Removes the standard square ripple
+                                                    ) {
+                                                        navController.navigate(route) {
+                                                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                                            launchSingleTop = true
+                                                            restoreState = true
+                                                        }
+                                                    }
+                                                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Icon(
+                                                        imageVector = icon,
+                                                        contentDescription = label,
+                                                        tint = contentColor,
+                                                        modifier = Modifier.size(24.dp)
+                                                    )
+                                                    // 🔹 Smoothly expanding text label
+                                                    AnimatedVisibility(visible = isSelected) {
+                                                        Text(
+                                                            text = label,
+                                                            color = contentColor,
+                                                            fontSize = 12.sp,
+                                                            fontWeight = FontWeight.Bold,
+                                                            modifier = Modifier.padding(start = 6.dp)
+                                                        )
+                                                    }
+                                                }
                                             }
-                                        },
-                                        colors = NavigationBarItemDefaults.colors(
-                                            selectedIconColor = Color(0xFF00C853),
-                                            selectedTextColor = Color(0xFF00C853),
-                                            unselectedIconColor = Color.Gray,
-                                            indicatorColor = Color(0xFFE8F5E9)
-                                        )
-                                    )
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -117,9 +172,10 @@ class MainActivity : ComponentActivity() {
                                 onNavigateToNotifications = { navController.navigate("notifications") },
                                 onNavigateToCreateTeam = { navController.navigate("createTeam") },
                                 onNavigateToDiscoverTeams = { navController.navigate("teamDiscovery") },
-                                onNavigateToMyTeams = { navController.navigate("manageTeams") }
+                                onNavigateToMyTeams = { navController.navigate("manageTeams") },
+                                onNavigateToMyBookings = { navController.navigate("myBookings") } // 🔹 NEW: Added routing to MyBookings
                             )
-                        } // 🔹 FIXED: Restored this missing closing brace!
+                        }
 
                         composable("teamDiscovery") {
                             TeamDiscoveryScreen(

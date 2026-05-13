@@ -1,15 +1,17 @@
 package com.shreyas.kreedaankana.features.challenge.ui
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -53,9 +55,17 @@ fun PostChallengeScreen(
     val dateRangePickerState = rememberDateRangePickerState()
 
     LaunchedEffect(Unit) {
-        // 🔹 FIX: Now uses loadMyTeams
         teamViewModel.loadMyTeams(AuthManager.getUserId())
     }
+
+    val textFieldColors = OutlinedTextFieldDefaults.colors(
+        focusedBorderColor = Color(0xFF00E676),
+        unfocusedBorderColor = Color(0xFFE0E0E0),
+        focusedContainerColor = Color.White,
+        unfocusedContainerColor = Color(0xFFFAFAFA),
+        focusedLeadingIconColor = Color(0xFF004D40),
+        unfocusedLeadingIconColor = Color.Gray
+    )
 
     Scaffold(
         topBar = { AppTopBar(title = "Post Open Challenge", onBack = onBack) },
@@ -66,49 +76,111 @@ fun PostChallengeScreen(
                 .padding(padding)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp),
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(value = selectedSport, onValueChange = { selectedSport = it }, label = { Text("Sport") }, placeholder = { Text("Cricket") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
-                OutlinedTextField(value = selectedFormat, onValueChange = { selectedFormat = it }, label = { Text("Format") }, placeholder = { Text("11-a-side") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+
+            Text(
+                text = "Set the rules, pick a time, and let opponents find you.",
+                color = Color.Gray,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .padding(horizontal = 8.dp)
+                    .padding(bottom = 8.dp) // 🔹 Chained separately!
+            )
+
+            // 🔹 MATCH DETAILS CARD
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text("MATCH DETAILS", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF004D40), letterSpacing = 1.sp)
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = selectedSport, onValueChange = { selectedSport = it },
+                            label = { Text("Sport") }, placeholder = { Text("Cricket") },
+                            leadingIcon = { Icon(Icons.Default.Sports, null) },
+                            modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = textFieldColors
+                        )
+                        OutlinedTextField(
+                            value = selectedFormat, onValueChange = { selectedFormat = it },
+                            label = { Text("Format") }, placeholder = { Text("11-a-side") },
+                            leadingIcon = { Icon(Icons.Default.Groups, null) },
+                            modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = textFieldColors
+                        )
+                    }
+
+                    OutlinedTextField(
+                        value = selectedLocation, onValueChange = { selectedLocation = it },
+                        label = { Text("Location Preference") }, placeholder = { Text("Any ground in XYZ area") },
+                        leadingIcon = { Icon(Icons.Default.LocationOn, null) },
+                        modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp), colors = textFieldColors
+                    )
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = selectedDateRange, onValueChange = { }, readOnly = true,
+                            label = { Text("Date Range") }, placeholder = { Text("Select Dates") },
+                            leadingIcon = { Icon(Icons.Default.CalendarMonth, null) },
+                            modifier = Modifier.weight(1.5f).clickable { showDatePicker = true },
+                            shape = RoundedCornerShape(12.dp), colors = textFieldColors,
+                            enabled = false // Using enabled false makes the whole area clickable easily
+                        )
+                        OutlinedTextField(
+                            value = selectedTime, onValueChange = { selectedTime = it },
+                            label = { Text("Time") }, placeholder = { Text("5 PM") },
+                            leadingIcon = { Icon(Icons.Default.Schedule, null) },
+                            modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = textFieldColors
+                        )
+                    }
+                }
             }
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = selectedDateRange,
-                    onValueChange = { },
-                    readOnly = true,
-                    label = { Text("Date Range") },
-                    placeholder = { Text("Select Dates") },
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Default.CalendarMonth, contentDescription = null, tint = Color(0xFF004D40))
-                        }
-                    },
-                    modifier = Modifier.weight(1.5f).clickable { showDatePicker = true },
-                    shape = RoundedCornerShape(12.dp)
-                )
-                OutlinedTextField(value = selectedTime, onValueChange = { selectedTime = it }, label = { Text("Time") }, placeholder = { Text("5 PM") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
+            // 🔹 EXTRA INFO CARD
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                elevation = CardDefaults.cardElevation(2.dp)
+            ) {
+                Column(Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                    Text("ADDITIONAL INFO", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFF004D40), letterSpacing = 1.sp)
+
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = prize, onValueChange = { prize = it },
+                            label = { Text("Prize (Opt)") }, placeholder = { Text("e.g. ₹5k") },
+                            leadingIcon = { Icon(Icons.Default.EmojiEvents, null) },
+                            modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = textFieldColors
+                        )
+                        OutlinedTextField(
+                            value = entryFee, onValueChange = { entryFee = it },
+                            label = { Text("Entry Fee") }, placeholder = { Text("Optional") },
+                            leadingIcon = { Icon(Icons.Default.ConfirmationNumber, null) },
+                            modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp), colors = textFieldColors
+                        )
+                    }
+
+                    OutlinedTextField(
+                        value = message, onValueChange = { message = it },
+                        label = { Text("Message to Opponents") }, placeholder = { Text("Bring your own ball...") },
+                        leadingIcon = { Icon(Icons.Default.ChatBubbleOutline, null) },
+                        modifier = Modifier.fillMaxWidth(), minLines = 3, shape = RoundedCornerShape(12.dp), colors = textFieldColors
+                    )
+                }
             }
 
-            OutlinedTextField(value = selectedLocation, onValueChange = { selectedLocation = it }, label = { Text("Location Preference") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp))
-
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(value = prize, onValueChange = { prize = it }, label = { Text("Prize (Optional)") }, placeholder = { Text("e.g. ₹5k") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
-                OutlinedTextField(value = entryFee, onValueChange = { entryFee = it }, label = { Text("Entry Fee") }, placeholder = { Text("Optional") }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp))
-            }
-
-            OutlinedTextField(value = message, onValueChange = { message = it }, label = { Text("Additional Message") }, modifier = Modifier.fillMaxWidth(), minLines = 3, shape = RoundedCornerShape(12.dp))
-
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
             Button(
                 onClick = {
                     scope.launch {
                         isLoading = true
                         try {
-                            // 🔹 FIX: Uses myTeams list instead of myTeam
                             var myTeamId = teamState.myTeams.firstOrNull()?.id
                             var myTeamName = teamState.myTeams.firstOrNull()?.teamName
 
@@ -153,13 +225,17 @@ fun PostChallengeScreen(
                         }
                     }
                 },
-                modifier = Modifier.fillMaxWidth().height(56.dp),
+                modifier = Modifier.fillMaxWidth().height(56.dp).padding(bottom = 24.dp),
                 enabled = selectedSport.isNotBlank() && selectedLocation.isNotBlank() && selectedDateRange.isNotBlank() && !isLoading,
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E676))
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00E676), disabledContainerColor = Color(0xFFB9F6CA))
             ) {
                 if (isLoading) CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp, color = Color.White)
-                else Text("Post Open Challenge", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                else {
+                    Icon(Icons.Default.FlashOn, contentDescription = null, tint = Color(0xFF004D40))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Post Open Challenge", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color(0xFF004D40))
+                }
             }
         }
     }
