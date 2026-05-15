@@ -45,14 +45,14 @@ KreedaAnkana is a premium, real-time sports matchmaking and ground booking appli
     <td align="center"><b>Grounds & Booking</b></td>
   </tr>
   <tr>
-    <td><img src="screenshots/login.png" width="250" alt="Login Screen"/></td>
-    <td><img src="screenshots/challenges.png" width="250" alt="Challenge Feed"/></td>
-    <td><img src="screenshots/grounds.png" width="250" alt="Ground List"/></td>
+    <td align="center"><img src="app/src/main/java/com/shreyas/kreedaankana/screenshots/login.jpeg" width="250" alt="Login Screen"/></td>
+    <td align="center"><img src="app/src/main/java/com/shreyas/kreedaankana/screenshots/challenges.jpg" width="250" alt="Challenge Feed"/></td>
+    <td align="center"><img src="app/src/main/java/com/shreyas/kreedaankana/screenshots/grounds.jpg" width="250" alt="Ground List"/></td>
   </tr>
   <tr>
-    <td><img src="screenshots/home.png" width="250" alt="Home Dashboard"/></td>
-    <td><br><i>Challenge Feeds, Negotiation Chat, and Dual-Verification Calendar flows.</i></td>
-    <td><img src="screenshots/slots.png" width="250" alt="Slot Selection"/></td>
+    <td align="center"><img src="app/src/main/java/com/shreyas/kreedaankana/screenshots/home.jpg" width="250" alt="Home Dashboard"/></td>
+    <td align="center"><br><i>Challenge Feeds, Negotiation Chat, and<br>Dual-Verification Calendar flows.</i></td>
+    <td align="center"><img src="app/src/main/java/com/shreyas/kreedaankana/screenshots/slots.jpg" width="250" alt="Slot Selection"/></td>
   </tr>
 </table>
 
