@@ -105,9 +105,7 @@ The Firestore NoSQL database is heavily normalized to prevent heavy reads and en
 To clone and run this project locally:
 
 1. Clone the repository: 
-   ```bash
    git clone [https://github.com/shreyasnnn/KreedaAnkana.git](https://github.com/YourUsername/KreedaAnkana.git)
-   ```
 2. Open the project in Android Studio (Iguana or newer recommended).
 3. Firebase Setup: * Create a Firebase project and enable Firestore & Google Authentication.
   - Generate a `google-services.json` file and place it inside the `app/` directory.
